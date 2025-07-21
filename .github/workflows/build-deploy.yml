@@ -42,6 +42,6 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.PROD_LOGIN }}@${{ secrets.PROD_HOST }} << 'EOF'
             cd ~/marketplace
             git pull origin main
-            docker-compose down
-            docker-compose up -d --build
+            docker compose down
+            docker compose up -d --build
           EOF
