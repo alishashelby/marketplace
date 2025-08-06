@@ -1,0 +1,11 @@
+repos:
+  - repo: local
+    hooks:
+      - id: golangci-lint
+        name: run golangci-lint per directory
+        entry: scripts/run-golangci-lint.sh
+        language: system
+        types: [go]
+        stages: [pre-commit]
+        require_serial: true
+        verbose: true
