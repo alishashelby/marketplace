@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/alishashelby/marketplace/internal/domain/entity"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v5"
 	"os"
 	"strconv"
 	"time"
