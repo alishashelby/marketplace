@@ -1,6 +1,6 @@
 module github.com/alishashelby/marketplace
 
-go 1.24.4
+go 1.23.9
 
 require (
 	github.com/go-playground/validator/v10 v10.27.0
