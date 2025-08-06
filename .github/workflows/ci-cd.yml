@@ -41,7 +41,7 @@ jobs:
 
       - name: Lint Go code
         run: |
-          golangci-lint run --timeout=5m -v --config ../.github/.golangci.yml
+          golangci-lint run --timeout=5m -v --config .github/.golangci.yml
 
   deploy:
     runs-on: ubuntu-latest
