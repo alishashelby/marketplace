@@ -31,11 +31,11 @@ func NewAdRepoMongoDB(db *mongo.Database) *AdRepoMongoDB {
 	}
 }
 
-func (r *AdRepoMongoDB) Save(Ad *entity.Ad) error {
+func (r *AdRepoMongoDB) Save(ad *entity.Ad) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err := r.collection.InsertOne(ctx, Ad)
+	_, err := r.collection.InsertOne(ctx, ad)
 	if err != nil {
 		return ErrorFailedToSaveAd
 	}

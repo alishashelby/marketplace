@@ -127,21 +127,21 @@ func (v *AdValidator) Validate(dto dto.AdDTO) map[string]any {
 
 func (v *AdValidator) ValidateOptions(ops *entity.Options) error {
 	if ops.Page < 1 {
-		return errors.New(fmt.Sprintf(ReportNeedPositive, entity.ParamPage))
+		return fmt.Errorf(ReportNeedPositive, entity.ParamPage)
 	}
 
 	if ops.Limit < 1 {
-		return errors.New(fmt.Sprintf(ReportNeedPositive, entity.ParamLimit))
+		return fmt.Errorf(ReportNeedPositive, entity.ParamLimit)
 	}
 	if ops.Limit > entity.LimitMaxValue {
 		ops.Limit = entity.LimitMaxValue
 	}
 
 	if ops.MinPrice < 0 {
-		return errors.New(fmt.Sprintf(ReportNeedPositive, entity.ParamMinPrice))
+		return fmt.Errorf(ReportNeedPositive, entity.ParamMinPrice)
 	}
 	if ops.MaxPrice < 0 {
-		return errors.New(fmt.Sprintf(ReportNeedPositive, entity.ParamMaxPrice))
+		return fmt.Errorf(ReportNeedPositive, entity.ParamMaxPrice)
 	}
 	if ops.MinPrice > ops.MaxPrice {
 		return errors.New(ReportErrorInComparePrices)
