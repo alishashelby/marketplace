@@ -29,7 +29,7 @@ func main() {
 		log.Print("PostgreSQL connection failed: ", err)
 		return
 	}
-	defer postgresDB.Close()
+	defer postgresDB.Close() //nolint:errcheck
 
 	log.Print("PostgreSQL connection established")
 

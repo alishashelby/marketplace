@@ -63,7 +63,7 @@ func (v *AdValidator) validateImgFormat(imgURL string, errors map[string]any) {
 		errors[ImageURLField] = fmt.Sprintf(ReportErrorFetchingImgFromURL, err)
 		return
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	if resp.StatusCode != http.StatusOK {
 		errors[ImageURLField] = fmt.Sprintf(ReportErrorUnavailableImg, resp.StatusCode)
@@ -100,19 +100,22 @@ func (v *AdValidator) validateImgFormat(imgURL string, errors map[string]any) {
 func (v *AdValidator) Validate(dto dto.AdDTO) map[string]any {
 	errs := make(map[string]any)
 
-	if val := v.validator.Struct(dto); val != nil {
-		for _, err := range val.(validator.ValidationErrors) {
-			switch err.Tag() {
-			case "min":
-				errs[err.Field()] = fmt.Sprintf(ReportNeedMoreCharacters, err.Field(), err.Param())
-			case "max":
-				errs[err.Field()] = fmt.Sprintf(ReportTooManyCharacters, err.Field(), err.Param())
-			case "url":
-				errs[err.Field()] = fmt.Sprintf(ReportNeedURL, err.Field())
-			case "gt":
-				errs[err.Field()] = fmt.Sprintf(ReportNeedPositive, err.Field())
-			default:
-				errs[err.Field()] = fmt.Sprintf(ReportFailedToValidate, err.Field())
+	if err := v.validator.Struct(dto); err != nil {
+		var validationErrors validator.ValidationErrors
+		if errors.As(err, &validationErrors) {
+			for _, valErr := range validationErrors {
+				switch valErr.Tag() {
+				case "min":
+					errs[valErr.Field()] = fmt.Sprintf(ReportNeedMoreCharacters, valErr.Field(), valErr.Param())
+				case "max":
+					errs[valErr.Field()] = fmt.Sprintf(ReportTooManyCharacters, valErr.Field(), valErr.Param())
+				case "url":
+					errs[valErr.Field()] = fmt.Sprintf(ReportNeedURL, valErr.Field())
+				case "gt":
+					errs[valErr.Field()] = fmt.Sprintf(ReportNeedPositive, valErr.Field())
+				default:
+					errs[valErr.Field()] = fmt.Sprintf(ReportFailedToValidate, valErr.Field())
+				}
 			}
 		}
 	}

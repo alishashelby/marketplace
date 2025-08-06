@@ -78,7 +78,7 @@ func (r *AdRepoMongoDB) FindAll(ops *entity.Options) ([]*entity.Ad, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer cursor.Close(ctx)
+	defer cursor.Close(ctx) //nolint:errcheck
 
 	var ads []*entity.Ad
 	if err = cursor.All(ctx, &ads); err != nil {

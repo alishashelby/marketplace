@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"errors"
 	"fmt"
 	"github.com/alishashelby/marketplace/internal/application/dto"
 	"github.com/go-playground/validator/v10"
@@ -20,20 +21,26 @@ func NewUserValidator() *UserValidator {
 }
 
 func (uv *UserValidator) Validate(dto dto.UserDTO) map[string]any {
-	if val := uv.validator.Struct(dto); val != nil {
+	if err := uv.validator.Struct(dto); err != nil {
 		errs := make(map[string]any)
-		for _, err := range val.(validator.ValidationErrors) {
-			switch err.Tag() {
-			case "min":
-				errs[err.Field()] = fmt.Sprintf(ReportNeedMoreCharacters, err.Field(), err.Param())
-			case "max":
-				errs[err.Field()] = fmt.Sprintf(ReportTooManyCharacters, err.Field(), err.Param())
-			case "alpha":
-				errs[err.Field()] = fmt.Sprintf(ReportMustBeOnlyLetters, err.Field())
-			case "containsany":
-				errs[err.Field()] = fmt.Sprintf(ReportMustBeOneSpecialSymbol, err.Field(), err.Param())
-			default:
-				errs[err.Field()] = fmt.Sprintf(ReportFailedToValidate, err.Field())
+		var validationErrors validator.ValidationErrors
+		if errors.As(err, &validationErrors) {
+			for _, valErr := range validationErrors {
+				switch valErr.Tag() {
+				case "min":
+					errs[valErr.Field()] = fmt.Sprintf(
+						ReportNeedMoreCharacters, valErr.Field(), valErr.Param())
+				case "max":
+					errs[valErr.Field()] = fmt.Sprintf(
+						ReportTooManyCharacters, valErr.Field(), valErr.Param())
+				case "alpha":
+					errs[valErr.Field()] = fmt.Sprintf(ReportMustBeOnlyLetters, valErr.Field())
+				case "containsany":
+					errs[valErr.Field()] = fmt.Sprintf(
+						ReportMustBeOneSpecialSymbol, valErr.Field(), valErr.Param())
+				default:
+					errs[valErr.Field()] = fmt.Sprintf(ReportFailedToValidate, valErr.Field())
+				}
 			}
 		}
 
