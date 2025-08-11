@@ -28,16 +28,23 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.PROD_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Build Docker image
-        run: docker build -t "${{ secrets.TAG }}" .
+      - name: Build Docker app image
+        run: docker build -t "${{ secrets.TAG_APP }}" -f migrations/Dockerfile migrations
 
-      - name: Push Docker image
-        run: docker push "${{ secrets.TAG }}"
+      - name: Push Docker app image
+        run: docker push "${{ secrets.TAG_APP }}"
+
+      - name: Build Docker goose image
+        run: docker build -t "${{ secrets.TAG_GOOSE }}" .
+
+      - name: Push Docker goose image
+        run: docker push "${{ secrets.TAG_GOOSE }}"
 
       - name: SSH Deploy
         run: |
           ssh ${{ secrets.PROD_LOGIN }}@${{ secrets.PROD_HOST }} << 'EOF'
             cd ~/marketplace
+            df -h
             git pull origin dev
             docker compose pull
             docker compose up -d
