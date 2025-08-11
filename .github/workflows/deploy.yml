@@ -38,6 +38,6 @@ jobs:
         run: |
           ssh ${{ secrets.PROD_LOGIN }}@${{ secrets.PROD_HOST }} << 'EOF'
             cd ~/marketplace
-            docker compose pull marketplace
-            docker compose up -d marketplace
+            docker compose pull
+            docker compose up -d
           EOF
