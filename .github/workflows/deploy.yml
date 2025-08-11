@@ -1,0 +1,40 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        run: docker login --username "${{ secrets.DOCKER_LOGIN }}" --password "${{ secrets.DOCKER_TOKEN }}"
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server SSH key to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.PROD_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Build Docker image
+        run: docker build -t "${{ secrets.TAG }}" .
+
+      - name: Push Docker image
+        run: docker push "${{ secrets.TAG }}"
+
+      - name: SSH Deploy
+        run: |
+          ssh ${{ secrets.PROD_LOGIN }}@${{ secrets.PROD_HOST }} << 'EOF'
+            cd ~/marketplace
+            docker compose pull marketplace
+            docker compose up -d marketplace
+          EOF
