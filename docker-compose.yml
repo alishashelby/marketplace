@@ -56,10 +56,11 @@ services:
       retries: 5
 
   marketplace:
+    container_name: marketplace_app
+    image: ${MARKETPLACE_IMAGE}
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: marketplace_app
     env_file: .env
     ports:
       - "${PORT}:8081"
