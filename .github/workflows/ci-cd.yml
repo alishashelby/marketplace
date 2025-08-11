@@ -13,9 +13,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.23.9'
+          go-version: '1.24.5'
 
       - name: Download dependencies
         run: go mod download
@@ -33,12 +33,12 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23.9'
+          go-version: '1.24.5'
           cache: 'true'
 
       - name: Install golangci-lint
         run: |
-          go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.60.3
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.2
 
       - name: Lint Go code
         run: |
