@@ -11,13 +11,31 @@ services:
     ports:
       - "${POSTGRES_PORT}:5432"
     volumes:
-      - ./internal/infrastructure/migrations:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
       interval: 5s
       timeout: 5s
       retries: 5
+
+  goose:
+    container_name: marketplace_goose
+    build:
+      context: ./migrations
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      MIGRATION_VERSION: ${MIGRATION_VERSION:-latest}
+    volumes:
+      - ./migrations/sql:/migrations/sql
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   mongodb:
     image: mongo:5
@@ -38,10 +56,11 @@ services:
       retries: 5
 
   marketplace:
+    container_name: marketplace_app
+    image: ${MARKETPLACE_IMAGE}
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: marketplace_app
     env_file: .env
     ports:
       - "${PORT}:8081"
