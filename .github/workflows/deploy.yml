@@ -29,10 +29,10 @@ jobs:
           ssh-keyscan -H ${{ secrets.PROD_HOST }} >> ~/.ssh/known_hosts
 
       - name: Build Docker image
-        run: docker build -t $TAG .
+        run: docker build -t "${{ secrets.TAG }} .
 
       - name: Push Docker image
-        run: docker push $TAG
+        run: docker push "${{ secrets.TAG }}
 
       - name: SSH Deploy
         run: |
