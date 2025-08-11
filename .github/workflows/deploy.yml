@@ -42,6 +42,11 @@ jobs:
         run: |
           ssh ${{ secrets.PROD_LOGIN }}@${{ secrets.PROD_HOST }} << 'EOF'
             cd ~/marketplace
+          
+            grep -v '^MARKETPLACE_IMAGE=' .env > .env.temp || true
+            echo "MARKETPLACE_IMAGE=${{ secrets.TAG }}" >> .env.temp
+            mv .env.temp .env
+          
             git pull origin dev
             docker compose pull
             docker compose up -d
