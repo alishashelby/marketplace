@@ -20,7 +20,9 @@ services:
 
   goose:
     container_name: marketplace_goose
-    image: alishashelby/marketplace_goose:latest
+    build:
+      context: ./migrations
+      dockerfile: Dockerfile
     env_file: .env
     environment:
       POSTGRES_HOST: postgres
@@ -54,7 +56,9 @@ services:
       retries: 5
 
   marketplace:
-    image: alishashelby/marketplace_app:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: marketplace_app
     env_file: .env
     ports:
