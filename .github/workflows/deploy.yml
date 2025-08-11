@@ -1,10 +1,7 @@
 name: Deploy
 
 on:
-#  push:
-#    branches:
-#      - main
-  pull_request:
+  push:
     branches:
       - main
 
@@ -47,7 +44,7 @@ jobs:
             echo "MARKETPLACE_IMAGE=${{ secrets.TAG }}" >> .env.temp
             mv .env.temp .env
           
-            git pull origin dev
+            git pull origin main
             docker compose pull
             docker compose up -d
           EOF
