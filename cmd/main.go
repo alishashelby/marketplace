@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"github.com/alishashelby/marketplace/internal/application/middleware"
 	"github.com/alishashelby/marketplace/internal/application/service"
@@ -11,6 +10,7 @@ import (
 	"github.com/alishashelby/marketplace/internal/infrastructure/repository/user"
 	"github.com/alishashelby/marketplace/internal/presenation/controller"
 	"github.com/gorilla/mux"
+	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -76,7 +76,7 @@ func getDotEnvVariable(key string) (string, error) {
 	return value, nil
 }
 
-func connectPostgres() (*sql.DB, error) {
+func connectPostgres() (*pgxpool.Pool, error) {
 	userEnv, err := getDotEnvVariable("POSTGRES_USER")
 	if err != nil {
 		return nil, err
@@ -92,7 +92,7 @@ func connectPostgres() (*sql.DB, error) {
 		return nil, err
 	}
 
-	db, err := sql.Open("pgx", fmt.Sprintf(
+	db, err := pgxpool.New(context.Background(), fmt.Sprintf(
 		"postgres://%s:%s@postgres:5432/%s",
 		userEnv,
 		passwordEnv,
@@ -102,7 +102,8 @@ func connectPostgres() (*sql.DB, error) {
 		return nil, err
 	}
 
-	if err = db.Ping(); err != nil {
+	if err = db.Ping(context.Background()); err != nil {
+		db.Close()
 		log.Println("Err:", err)
 	}
 
@@ -143,7 +144,7 @@ func connectMongo(ctx context.Context) (*mongo.Client, error) {
 	return client, nil
 }
 
-func registerRoutes(postgresDB *sql.DB, mongoDB *mongo.Database) (http.Handler, error) {
+func registerRoutes(postgresDB *pgxpool.Pool, mongoDB *mongo.Database) (http.Handler, error) {
 	jwtService, err := service.NewJWTService()
 	if err != nil {
 		return nil, err
