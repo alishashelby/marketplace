@@ -2,6 +2,7 @@ package service
 
 import "github.com/alishashelby/marketplace/internal/domain/entity"
 
+//go:generate mockgen -source=ad_service.go -destination=ad_repo_mock.go -package=service AdRepository
 type AdRepository interface {
 	Save(ad *entity.Ad) error
 	FindAll(ops *entity.Options) ([]*entity.Ad, error)

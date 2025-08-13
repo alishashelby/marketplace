@@ -43,3 +43,19 @@ jobs:
       - name: Lint Go code
         run: |
           golangci-lint run --timeout=5m -v --config .github/.golangci.yml
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.5'
+          cache: true
+
+      - name: Run tests
+        run: go test -v ./...

@@ -19,8 +19,8 @@ const (
 	IssuedAtKey ctxKey = "iat"
 	ExpiryKey   ctxKey = "exp"
 
-	dotEnvJWTSecret     = "JWT_SECRET"
-	dotEnvJWTExpiration = "JWT_TTL"
+	DotEnvJWTSecret     = "JWT_SECRET"
+	DotEnvJWTExpiration = "JWT_TTL"
 )
 
 var (
@@ -36,12 +36,12 @@ type JWTService struct {
 }
 
 func NewJWTService() (*JWTService, error) {
-	secret := []byte(os.Getenv(dotEnvJWTSecret))
+	secret := []byte(os.Getenv(DotEnvJWTSecret))
 	if secret == nil {
 		return nil, errorLoadingSecret
 	}
 
-	ttl := os.Getenv(dotEnvJWTExpiration)
+	ttl := os.Getenv(DotEnvJWTExpiration)
 	if ttl == "" {
 		return nil, errorLoadingTTL
 	}
