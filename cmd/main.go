@@ -8,7 +8,7 @@ import (
 	"github.com/alishashelby/marketplace/internal/application/validator"
 	"github.com/alishashelby/marketplace/internal/infrastructure/repository/ad"
 	"github.com/alishashelby/marketplace/internal/infrastructure/repository/user"
-	"github.com/alishashelby/marketplace/internal/presenation/controller"
+	"github.com/alishashelby/marketplace/internal/presentation/controller"
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
