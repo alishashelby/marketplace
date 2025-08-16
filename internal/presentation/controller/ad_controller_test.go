@@ -506,7 +506,7 @@ func TestAdController_GetIDFromToken_NothingInContext(t *testing.T) {
 	id, err := test.adController.getIDFromToken(req)
 
 	assert.Error(t, err)
-	assert.Equal(t, unauthorizedError, err)
+	assert.Equal(t, unauthorizedError, err.Error())
 	assert.Equal(t, uuid.Nil, id)
 }
 
@@ -520,6 +520,6 @@ func TestAdController_GetIDFromToken_InvalidType(t *testing.T) {
 	id, err := test.adController.getIDFromToken(req)
 
 	assert.Error(t, err)
-	assert.Equal(t, unauthorizedError, err)
+	assert.Equal(t, unauthorizedError, err.Error())
 	assert.Equal(t, uuid.Nil, id)
 }
