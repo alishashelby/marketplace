@@ -49,6 +49,7 @@ func TestUserRepoPostgres_Save(t *testing.T) {
 	})
 }
 
+// nolint:dupl
 func TestUserRepoPostgres_GetByUsername(t *testing.T) {
 	mock, err := pgxmock.NewPool(pgxmock.QueryMatcherOption(pgxmock.QueryMatcherEqual))
 	if err != nil {
@@ -104,8 +105,9 @@ func TestUserRepoPostgres_GetByUsername(t *testing.T) {
 		assert.Nil(t, user)
 		assert.NoError(t, mock.ExpectationsWereMet())
 	})
-} //nolint:dupl
+}
 
+// nolint:dupl
 func TestUserRepoPostgres_GetByID(t *testing.T) {
 	mock, err := pgxmock.NewPool(pgxmock.QueryMatcherOption(pgxmock.QueryMatcherEqual))
 	if err != nil {
@@ -160,4 +162,4 @@ func TestUserRepoPostgres_GetByID(t *testing.T) {
 		assert.Nil(t, user)
 		assert.NoError(t, mock.ExpectationsWereMet())
 	})
-} //nolint:dupl
+}
