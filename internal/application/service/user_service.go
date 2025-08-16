@@ -14,6 +14,7 @@ var (
 	ErrorInvalidPassword               = errors.New("invalid password")
 )
 
+//go:generate mockgen -source=user_service.go -destination=user_repo_mock.go -package=service UserRepository
 type UserRepository interface {
 	Save(user *entity.User) error
 	GetByUsername(username string) (*entity.User, error)
