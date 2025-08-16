@@ -15,6 +15,10 @@ import (
 	"strconv"
 )
 
+const (
+	unauthorizedError = "invalid or missing user ID"
+)
+
 type AdController struct {
 	adService   *service.AdService
 	userService *service.UserService
@@ -94,7 +98,7 @@ func (ac *AdController) GetAllAds(w http.ResponseWriter, r *http.Request) {
 func (ac *AdController) getIDFromToken(r *http.Request) (uuid.UUID, error) {
 	userID, ok := r.Context().Value(service.UserIDKey).(uuid.UUID)
 	if !ok {
-		return uuid.Nil, errors.New("invalid or missing user ID")
+		return uuid.Nil, errors.New(unauthorizedError)
 	}
 
 	return userID, nil

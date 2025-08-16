@@ -38,6 +38,7 @@ const (
 	ReportFailedToValidate            = "failed to validate field %s"
 	ReportErrorInComparePrices        = "min_price cannot be greater than max_price"
 	ReportInvalidSortBy               = "invalid sort_by parameter"
+	ReportInvalidOrderBy              = "invalid order_by parameter"
 )
 
 type AdValidator struct {
@@ -155,7 +156,7 @@ func (v *AdValidator) ValidateOptions(ops *entity.Options) error {
 	}
 
 	if ops.OrderBy != 0 && ops.OrderBy != entity.OrderByAsc && ops.OrderBy != entity.OrderByDesc {
-		return errors.New("invalid order_by parameter")
+		return errors.New(ReportInvalidOrderBy)
 	}
 
 	return nil
