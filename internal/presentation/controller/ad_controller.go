@@ -52,6 +52,7 @@ func (ac *AdController) CreateAd(w http.ResponseWriter, r *http.Request) {
 	userID, err := ac.getIDFromToken(r)
 	if err != nil {
 		pkg.SendJSON(w, http.StatusUnauthorized, err.Error())
+		return
 	}
 
 	user, err := ac.userService.GetByID(userID)
