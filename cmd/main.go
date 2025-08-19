@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	_ "github.com/alishashelby/marketplace/docs"
 	"github.com/alishashelby/marketplace/internal/application/middleware"
 	"github.com/alishashelby/marketplace/internal/application/service"
 	"github.com/alishashelby/marketplace/internal/application/validator"
@@ -12,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -20,6 +22,10 @@ import (
 	"time"
 )
 
+// @title Marketplace API
+// @version 1.0
+// @description This is API for online marketplace.
+// @BasePath /api
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -161,6 +167,8 @@ func registerRoutes(postgresDB *pgxpool.Pool, mongoDB *mongo.Database) (http.Han
 	adController := controller.NewAdController(adService, userService, adValidator)
 
 	r := mux.NewRouter()
+
+	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	public := r.NewRoute().Subrouter()
 
