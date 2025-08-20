@@ -4,9 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/alishashelby/marketplace/internal/application/dto"
-	"github.com/alishashelby/marketplace/internal/domain/entity"
-	"github.com/go-playground/validator/v10"
 	"image"
 	_ "image/gif"
 	_ "image/jpeg"
@@ -15,6 +12,10 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/alishashelby/marketplace/internal/application/dto"
+	"github.com/alishashelby/marketplace/internal/domain/entity"
+	"github.com/go-playground/validator/v10"
 )
 
 const (
@@ -57,7 +58,7 @@ func NewAdValidator() *AdValidator {
 	}
 }
 
-func (v *AdValidator) validateImgFormat(imgURL string, errors map[string]any) {
+func (v *AdValidator) validateImgFormat(imgURL string, errors map[string]string) {
 	client := &http.Client{Timeout: timeout}
 	resp, err := client.Get(imgURL)
 	if err != nil {
@@ -98,8 +99,8 @@ func (v *AdValidator) validateImgFormat(imgURL string, errors map[string]any) {
 	}
 }
 
-func (v *AdValidator) Validate(dto dto.AdDTO) map[string]any {
-	errs := make(map[string]any)
+func (v *AdValidator) Validate(dto dto.AdDTO) map[string]string {
+	errs := make(map[string]string)
 
 	if err := v.validator.Struct(dto); err != nil {
 		var validationErrors validator.ValidationErrors
