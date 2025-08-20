@@ -1,8 +1,332 @@
 basePath: /api
+definitions:
+  dto.AdDTO:
+    properties:
+      image_url:
+        example: https://upload.wikimedia.org/wikipedia/commons/c/c7/Tabby_cat_with_blue_eyes-3336579.jpg
+        type: string
+      price:
+        example: 1500.5
+        type: number
+      text:
+        example: This is the test ad. Check new image.
+        maxLength: 1000
+        minLength: 20
+        type: string
+      title:
+        example: Title of test ad
+        maxLength: 20
+        minLength: 5
+        type: string
+    required:
+    - image_url
+    - price
+    - text
+    - title
+    type: object
+  dto.AdResponse:
+    properties:
+      created_at:
+        example: "2025-08-11T19:14:03.187Z"
+        type: string
+      image_url:
+        example: https://upload.wikimedia.org/wikipedia/commons/c/c7/Tabby_cat_with_blue_eyes-3336579.jpg
+        type: string
+      is_owner:
+        example: true
+        type: boolean
+      price:
+        example: 1500.5
+        type: number
+      text:
+        example: This is the test ad. Check new image.
+        type: string
+      title:
+        example: Title of test ad
+        type: string
+      username:
+        example: alisha
+        type: string
+    type: object
+  dto.UserDTO:
+    properties:
+      password:
+        example: 1234567&
+        maxLength: 15
+        minLength: 8
+        type: string
+      username:
+        example: alisha
+        maxLength: 30
+        minLength: 3
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  pkg.ErrorResponse:
+    description: This is the standard error response format for all API endpoints
+    properties:
+      error:
+        example: error description
+        type: string
+    type: object
+  pkg.ValidationErrorResponse:
+    description: This is the validation error response format
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        example:
+          error: ' error description'
+        type: object
+    type: object
 info:
   contact: {}
-  description: This is API for managing users and ads.
+  description: This is API for online marketplace.
   title: Marketplace API
   version: "1.0"
-paths: {}
+paths:
+  /api/ads:
+    get:
+      description: Returns a list of all published advertisements
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        maximum: 40
+        minimum: 1
+        name: limit
+        type: integer
+      - default: created_at
+        description: Sort field (created_at, price)
+        in: query
+        name: sortBy
+        type: string
+      - default: -1
+        description: Order (1 asc, -1 desc)
+        in: query
+        name: orderBy
+        type: integer
+      - description: Minimum price
+        in: query
+        name: minPrice
+        type: number
+      - description: Maximum price
+        in: query
+        name: maxPrice
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.AdResponse'
+            type: array
+        "400":
+          description: Invalid query params
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+        "404":
+          description: No ads found
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      summary: Get all ads
+      tags:
+      - Ads
+  /api/ads/:
+    get:
+      description: Returns a list of advertisements with ownership flag for the authenticated
+        user
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        maximum: 40
+        minimum: 1
+        name: limit
+        type: integer
+      - default: created_at
+        description: Sort field (created_at, price)
+        in: query
+        name: sortBy
+        type: string
+      - default: -1
+        description: Order (1 asc, -1 desc)
+        in: query
+        name: orderBy
+        type: integer
+      - description: Minimum price
+        in: query
+        name: minPrice
+        type: number
+      - description: Maximum price
+        in: query
+        name: maxPrice
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.AdResponse'
+            type: array
+        "400":
+          description: Invalid query params
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+        "404":
+          description: No ads found
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get ads with ownership info
+      tags:
+      - Ads
+  /api/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates the user and returns a JWT token
+      parameters:
+      - description: User credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: token
+          headers:
+            Authorization:
+              description: Bearer token
+              type: string
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      summary: Authenticate user
+      tags:
+      - users
+  /api/publish:
+    post:
+      consumes:
+      - application/json
+      description: Publishes a new ad for the authenticated user
+      parameters:
+      - description: Ad data
+        in: body
+        name: ad
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AdDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.AdResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/pkg.ValidationErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new advertisement
+      tags:
+      - Ads
+  /api/register:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user account and returns a JWT token in the Authorization
+        header
+      parameters:
+      - description: User credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          headers:
+            Authorization:
+              description: Bearer token
+              type: string
+          schema:
+            $ref: '#/definitions/dto.UserDTO'
+        "400":
+          description: Validation or parsing error
+          schema:
+            $ref: '#/definitions/pkg.ValidationErrorResponse'
+        "409":
+          description: User already exists
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      summary: Register a new user
+      tags:
+      - users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

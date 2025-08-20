@@ -25,6 +25,11 @@ import (
 // @title Marketplace API
 // @version 1.0
 // @description This is API for online marketplace.
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+
 // @BasePath /api
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

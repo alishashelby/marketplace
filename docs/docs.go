@@ -14,7 +14,482 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/api/ads": {
+            "get": {
+                "description": "Returns a list of all published advertisements",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Ads"
+                ],
+                "summary": "Get all ads",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 40,
+                        "minimum": 1,
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "created_at",
+                        "description": "Sort field (created_at, price)",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": -1,
+                        "description": "Order (1 asc, -1 desc)",
+                        "name": "orderBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Minimum price",
+                        "name": "minPrice",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Maximum price",
+                        "name": "maxPrice",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.AdResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid query params",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "No ads found",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/ads/": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a list of advertisements with ownership flag for the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Ads"
+                ],
+                "summary": "Get ads with ownership info",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 40,
+                        "minimum": 1,
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "created_at",
+                        "description": "Sort field (created_at, price)",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": -1,
+                        "description": "Order (1 asc, -1 desc)",
+                        "name": "orderBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Minimum price",
+                        "name": "minPrice",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Maximum price",
+                        "name": "maxPrice",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.AdResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid query params",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "No ads found",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
+                "description": "Authenticates the user and returns a JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Authenticate user",
+                "parameters": [
+                    {
+                        "description": "User credentials",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        },
+                        "headers": {
+                            "Authorization": {
+                                "type": "string",
+                                "description": "Bearer token"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/publish": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Publishes a new ad for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Ads"
+                ],
+                "summary": "Create a new advertisement",
+                "parameters": [
+                    {
+                        "description": "Ad data",
+                        "name": "ad",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AdDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.AdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ValidationErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/register": {
+            "post": {
+                "description": "Creates a new user account and returns a JWT token in the Authorization header",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Register a new user",
+                "parameters": [
+                    {
+                        "description": "User credentials",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserDTO"
+                        },
+                        "headers": {
+                            "Authorization": {
+                                "type": "string",
+                                "description": "Bearer token"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation or parsing error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ValidationErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "User already exists",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.AdDTO": {
+            "type": "object",
+            "required": [
+                "image_url",
+                "price",
+                "text",
+                "title"
+            ],
+            "properties": {
+                "image_url": {
+                    "type": "string",
+                    "example": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Tabby_cat_with_blue_eyes-3336579.jpg"
+                },
+                "price": {
+                    "type": "number",
+                    "example": 1500.5
+                },
+                "text": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 20,
+                    "example": "This is the test ad. Check new image."
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 5,
+                    "example": "Title of test ad"
+                }
+            }
+        },
+        "dto.AdResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string",
+                    "example": "2025-08-11T19:14:03.187Z"
+                },
+                "image_url": {
+                    "type": "string",
+                    "example": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Tabby_cat_with_blue_eyes-3336579.jpg"
+                },
+                "is_owner": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "price": {
+                    "type": "number",
+                    "example": 1500.5
+                },
+                "text": {
+                    "type": "string",
+                    "example": "This is the test ad. Check new image."
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Title of test ad"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "alisha"
+                }
+            }
+        },
+        "dto.UserDTO": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "maxLength": 15,
+                    "minLength": 8,
+                    "example": "1234567\u0026"
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 30,
+                    "minLength": 3,
+                    "example": "alisha"
+                }
+            }
+        },
+        "pkg.ErrorResponse": {
+            "description": "This is the standard error response format for all API endpoints",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "error description"
+                }
+            }
+        },
+        "pkg.ValidationErrorResponse": {
+            "description": "This is the validation error response format",
+            "type": "object",
+            "properties": {
+                "errors": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "error": " error description"
+                    }
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
@@ -24,7 +499,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api",
 	Schemes:          []string{},
 	Title:            "Marketplace API",
-	Description:      "This is API for managing users and ads.",
+	Description:      "This is API for online marketplace.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
