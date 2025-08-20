@@ -3,6 +3,10 @@ package controller
 import (
 	"encoding/json"
 	"errors"
+	"log"
+	"net/http"
+	"strconv"
+
 	"github.com/alishashelby/marketplace/internal/application/dto"
 	"github.com/alishashelby/marketplace/internal/application/service"
 	"github.com/alishashelby/marketplace/internal/application/validator"
@@ -10,9 +14,6 @@ import (
 	"github.com/alishashelby/marketplace/internal/infrastructure/repository/ad"
 	"github.com/alishashelby/marketplace/pkg"
 	"github.com/google/uuid"
-	"log"
-	"net/http"
-	"strconv"
 )
 
 const (
@@ -35,18 +36,19 @@ func NewAdController(adService *service.AdService,
 }
 
 // CreateAd godoc
-// @Summary Create a new advertisement
-// @Description Publishes a new ad for the authenticated user
-// @Tags Ads
-// @Security BearerAuth
-// @Accept json
-// @Produce json
-// @Param ad body dto.AdDTO true "Ad data"
-// @Success 201 {object} dto.AdResponse
-// @Failure 400 {object} pkg.ValidationErrorResponse "Validation error"
-// @Failure 401 {object} pkg.ErrorResponse "Unauthorized"
-// @Failure 500 {object} pkg.ErrorResponse "Internal server error"
-// @Router /api/publish [post]
+//
+//	@Summary		Create a new advertisement
+//	@Description	Publishes a new ad for the authenticated user
+//	@Tags			Ads
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			ad	body		dto.AdDTO	true	"Ad data"
+//	@Success		201	{object}	dto.AdResponse
+//	@Failure		400	{object}	pkg.ValidationErrorResponse	"Validation error"
+//	@Failure		401	{object}	pkg.ErrorResponse			"Unauthorized"
+//	@Failure		500	{object}	pkg.ErrorResponse			"Internal server error"
+//	@Router			/api/publish [post]
 func (ac *AdController) CreateAd(w http.ResponseWriter, r *http.Request) {
 	log.Print("AdController.CreateAd called")
 
@@ -92,23 +94,24 @@ func (ac *AdController) CreateAd(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetAdsWithOwned godoc
-// @Summary Get ads with ownership info
-// @Description Returns a list of advertisements with ownership flag for the authenticated user
-// @Tags Ads
-// @Security BearerAuth
-// @Produce json
-// @Param page query int false "Page number" default(1)
-// @Param limit query int false "Items per page" default(10) minimum(1) maximum(40)
-// @Param sortBy query string false "Sort field (created_at, price)" default(created_at)
-// @Param orderBy query int false "Order (1 asc, -1 desc)" default(-1)
-// @Param minPrice query number false "Minimum price"
-// @Param maxPrice query number false "Maximum price"
-// @Success 200 {array} dto.AdResponse
-// @Failure 400 {object} pkg.ErrorResponse "Invalid query params"
-// @Failure 401 {object} pkg.ErrorResponse "Unauthorized"
-// @Failure 404 {object} pkg.ErrorResponse "No ads found"
-// @Failure 500 {object} pkg.ErrorResponse "Internal server error"
-// @Router /api/ads/ [get]
+//
+//	@Summary		Get ads with ownership info
+//	@Description	Returns a list of advertisements with ownership flag for the authenticated user
+//	@Tags			Ads
+//	@Security		BearerAuth
+//	@Produce		json
+//	@Param			page		query		int		false	"Page number"						default(1)
+//	@Param			limit		query		int		false	"Items per page"					default(10)	minimum(1)	maximum(40)
+//	@Param			sortBy		query		string	false	"Sort field (created_at, price)"	default(created_at)
+//	@Param			orderBy		query		int		false	"Order (1 asc, -1 desc)"			default(-1)
+//	@Param			minPrice	query		number	false	"Minimum price"
+//	@Param			maxPrice	query		number	false	"Maximum price"
+//	@Success		200			{array}		dto.AdResponse
+//	@Failure		400			{object}	pkg.ErrorResponse	"Invalid query params"
+//	@Failure		401			{object}	pkg.ErrorResponse	"Unauthorized"
+//	@Failure		404			{object}	pkg.ErrorResponse	"No ads found"
+//	@Failure		500			{object}	pkg.ErrorResponse	"Internal server error"
+//	@Router			/api/ads/ [get]
 func (ac *AdController) GetAdsWithOwned(w http.ResponseWriter, r *http.Request) {
 	log.Print("AdController.GetAdsWithOwned called")
 
@@ -122,21 +125,22 @@ func (ac *AdController) GetAdsWithOwned(w http.ResponseWriter, r *http.Request) 
 }
 
 // GetAllAds godoc
-// @Summary Get all ads
-// @Description  Returns a list of all published advertisements
-// @Tags Ads
-// @Produce json
-// @Param page query int false "Page number" default(1)
-// @Param limit query int false "Items per page" default(10) minimum(1) maximum(40)
-// @Param sortBy query string false "Sort field (created_at, price)" default(created_at)
-// @Param orderBy query int false "Order (1 asc, -1 desc)" default(-1)
-// @Param minPrice query number false "Minimum price"
-// @Param maxPrice query number false "Maximum price"
-// @Success 200 {array} dto.AdResponse
-// @Failure 400 {object} pkg.ErrorResponse "Invalid query params"
-// @Failure 404 {object} pkg.ErrorResponse "No ads found"
-// @Failure 500 {object} pkg.ErrorResponse "Internal server error"
-// @Router /api/ads [get]
+//
+//	@Summary		Get all ads
+//	@Description	Returns a list of all published ads
+//	@Tags			Ads
+//	@Produce		json
+//	@Param			page		query		int		false	"Page number"						default(1)
+//	@Param			limit		query		int		false	"Items per page"					default(10)	minimum(1)	maximum(40)
+//	@Param			sortBy		query		string	false	"Sort field (created_at, price)"	default(created_at)
+//	@Param			orderBy		query		int		false	"Order (1 asc, -1 desc)"			default(-1)
+//	@Param			minPrice	query		number	false	"Minimum price"
+//	@Param			maxPrice	query		number	false	"Maximum price"
+//	@Success		200			{array}		dto.AdResponse
+//	@Failure		400			{object}	pkg.ErrorResponse	"Invalid query params"
+//	@Failure		404			{object}	pkg.ErrorResponse	"No ads found"
+//	@Failure		500			{object}	pkg.ErrorResponse	"Internal server error"
+//	@Router			/api/ads [get]
 func (ac *AdController) GetAllAds(w http.ResponseWriter, r *http.Request) {
 	log.Print("AdController.GetAllAds called")
 

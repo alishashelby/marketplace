@@ -3,11 +3,12 @@ package service
 import (
 	"errors"
 	"fmt"
-	"github.com/alishashelby/marketplace/internal/domain/entity"
-	"github.com/golang-jwt/jwt/v5"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/alishashelby/marketplace/internal/domain/entity"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type ctxKey string

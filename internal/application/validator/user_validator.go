@@ -3,6 +3,7 @@ package validator
 import (
 	"errors"
 	"fmt"
+
 	"github.com/alishashelby/marketplace/internal/application/dto"
 	"github.com/go-playground/validator/v10"
 )

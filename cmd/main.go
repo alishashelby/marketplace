@@ -3,6 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
 	_ "github.com/alishashelby/marketplace/docs"
 	"github.com/alishashelby/marketplace/internal/application/middleware"
 	"github.com/alishashelby/marketplace/internal/application/service"
@@ -16,21 +21,17 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
-	"net/http"
-	"os"
-	"time"
 )
 
-// @title Marketplace API
-// @version 1.0
-// @description This is API for online marketplace.
+//	@title			Marketplace API
+//	@version		1.0
+//	@description	This is API for online marketplace.
 
-// @securityDefinitions.apikey BearerAuth
-// @in header
-// @name Authorization
+//	@securityDefinitions.apikey	BearerAuth
+//	@in							header
+//	@name						Authorization
 
-// @BasePath /api
+// @BasePath	/api
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

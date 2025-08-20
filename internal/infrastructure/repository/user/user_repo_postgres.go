@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+
 	"github.com/alishashelby/marketplace/internal/domain/entity"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"

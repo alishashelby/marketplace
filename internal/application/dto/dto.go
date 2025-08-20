@@ -1,9 +1,10 @@
 package dto
 
 import (
+	"time"
+
 	"github.com/alishashelby/marketplace/internal/domain/entity"
 	"github.com/google/uuid"
-	"time"
 )
 
 type UserDTO struct {
