@@ -2,12 +2,13 @@ package middleware
 
 import (
 	"context"
-	"github.com/alishashelby/marketplace/internal/application/service"
-	"github.com/alishashelby/marketplace/pkg"
-	"github.com/google/uuid"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/alishashelby/marketplace/internal/application/service"
+	"github.com/alishashelby/marketplace/pkg"
+	"github.com/google/uuid"
 )
 
 const (

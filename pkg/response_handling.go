@@ -16,3 +16,11 @@ func SendJSON(w http.ResponseWriter, status int, data any) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
 }
+
+func SendError(w http.ResponseWriter, status int, message string) {
+	SendJSON(w, status, ErrorResponse{Error: message})
+}
+
+func SendValidationError(w http.ResponseWriter, status int, errors map[string]string) {
+	SendJSON(w, status, ValidationErrorResponse{Errors: errors})
+}

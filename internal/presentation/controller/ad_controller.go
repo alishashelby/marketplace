@@ -3,6 +3,10 @@ package controller
 import (
 	"encoding/json"
 	"errors"
+	"log"
+	"net/http"
+	"strconv"
+
 	"github.com/alishashelby/marketplace/internal/application/dto"
 	"github.com/alishashelby/marketplace/internal/application/service"
 	"github.com/alishashelby/marketplace/internal/application/validator"
@@ -10,9 +14,6 @@ import (
 	"github.com/alishashelby/marketplace/internal/infrastructure/repository/ad"
 	"github.com/alishashelby/marketplace/pkg"
 	"github.com/google/uuid"
-	"log"
-	"net/http"
-	"strconv"
 )
 
 const (
@@ -34,30 +35,44 @@ func NewAdController(adService *service.AdService,
 	}
 }
 
+// CreateAd godoc
+//
+//	@Summary		Create a new advertisement
+//	@Description	Publishes a new ad for the authenticated user
+//	@Tags			Ads
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			ad	body		dto.AdDTO	true	"Ad data"
+//	@Success		201	{object}	dto.AdResponse
+//	@Failure		400	{object}	pkg.ValidationErrorResponse	"Validation error"
+//	@Failure		401	{object}	pkg.ErrorResponse			"Unauthorized"
+//	@Failure		500	{object}	pkg.ErrorResponse			"Internal server error"
+//	@Router			/api/publish [post]
 func (ac *AdController) CreateAd(w http.ResponseWriter, r *http.Request) {
 	log.Print("AdController.CreateAd called")
 
 	var adDTO dto.AdDTO
 	if err := json.NewDecoder(r.Body).Decode(&adDTO); err != nil {
-		pkg.SendJSON(w, http.StatusBadRequest, err.Error())
+		pkg.SendError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	errs := ac.validator.Validate(adDTO)
 	if errs != nil {
-		pkg.SendJSON(w, http.StatusBadRequest, errs)
+		pkg.SendValidationError(w, http.StatusBadRequest, errs)
 		return
 	}
 
 	userID, err := ac.getIDFromToken(r)
 	if err != nil {
-		pkg.SendJSON(w, http.StatusUnauthorized, err.Error())
+		pkg.SendError(w, http.StatusUnauthorized, err.Error())
 		return
 	}
 
 	user, err := ac.userService.GetByID(userID)
 	if err != nil {
-		pkg.SendJSON(w, http.StatusInternalServerError, err.Error())
+		pkg.SendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -70,7 +85,7 @@ func (ac *AdController) CreateAd(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err = ac.adService.Create(newAdd); err != nil {
-		pkg.SendJSON(w, http.StatusInternalServerError, err.Error())
+		pkg.SendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -78,18 +93,54 @@ func (ac *AdController) CreateAd(w http.ResponseWriter, r *http.Request) {
 	pkg.SendJSON(w, http.StatusCreated, adResp)
 }
 
+// GetAdsWithOwned godoc
+//
+//	@Summary		Get ads with ownership info
+//	@Description	Returns a list of advertisements with ownership flag for the authenticated user
+//	@Tags			Ads
+//	@Security		BearerAuth
+//	@Produce		json
+//	@Param			page		query		int		false	"Page number"						default(1)
+//	@Param			limit		query		int		false	"Items per page"					default(10)	minimum(1)	maximum(40)
+//	@Param			sortBy		query		string	false	"Sort field (created_at, price)"	default(created_at)
+//	@Param			orderBy		query		int		false	"Order (1 asc, -1 desc)"			default(-1)
+//	@Param			minPrice	query		number	false	"Minimum price"
+//	@Param			maxPrice	query		number	false	"Maximum price"
+//	@Success		200			{array}		dto.AdResponse
+//	@Failure		400			{object}	pkg.ErrorResponse	"Invalid query params"
+//	@Failure		401			{object}	pkg.ErrorResponse	"Unauthorized"
+//	@Failure		404			{object}	pkg.ErrorResponse	"No ads found"
+//	@Failure		500			{object}	pkg.ErrorResponse	"Internal server error"
+//	@Router			/api/ads/ [get]
 func (ac *AdController) GetAdsWithOwned(w http.ResponseWriter, r *http.Request) {
 	log.Print("AdController.GetAdsWithOwned called")
 
 	userID, err := ac.getIDFromToken(r)
 	if err != nil {
-		pkg.SendJSON(w, http.StatusUnauthorized, err.Error())
+		pkg.SendError(w, http.StatusUnauthorized, err.Error())
 		return
 	}
 
 	ac.getAds(w, r, userID)
 }
 
+// GetAllAds godoc
+//
+//	@Summary		Get all ads
+//	@Description	Returns a list of all published ads
+//	@Tags			Ads
+//	@Produce		json
+//	@Param			page		query		int		false	"Page number"						default(1)
+//	@Param			limit		query		int		false	"Items per page"					default(10)	minimum(1)	maximum(40)
+//	@Param			sortBy		query		string	false	"Sort field (created_at, price)"	default(created_at)
+//	@Param			orderBy		query		int		false	"Order (1 asc, -1 desc)"			default(-1)
+//	@Param			minPrice	query		number	false	"Minimum price"
+//	@Param			maxPrice	query		number	false	"Maximum price"
+//	@Success		200			{array}		dto.AdResponse
+//	@Failure		400			{object}	pkg.ErrorResponse	"Invalid query params"
+//	@Failure		404			{object}	pkg.ErrorResponse	"No ads found"
+//	@Failure		500			{object}	pkg.ErrorResponse	"Internal server error"
+//	@Router			/api/ads [get]
 func (ac *AdController) GetAllAds(w http.ResponseWriter, r *http.Request) {
 	log.Print("AdController.GetAllAds called")
 
@@ -171,18 +222,18 @@ func (ac *AdController) parseOptions(r *http.Request) (*entity.Options, error) {
 func (ac *AdController) getAds(w http.ResponseWriter, r *http.Request, userID uuid.UUID) {
 	ops, err := ac.parseOptions(r)
 	if err != nil {
-		pkg.SendJSON(w, http.StatusBadRequest, err.Error())
+		pkg.SendError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	ads, err := ac.adService.GetAds(ops)
 	if err != nil {
 		if errors.Is(err, ad.ErrorAdsNotFound) {
-			pkg.SendJSON(w, http.StatusNotFound, err.Error())
+			pkg.SendError(w, http.StatusNotFound, err.Error())
 			return
 		}
 
-		pkg.SendJSON(w, http.StatusInternalServerError, err.Error())
+		pkg.SendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 

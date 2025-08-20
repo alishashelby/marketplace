@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+
 	"github.com/alishashelby/marketplace/internal/domain/entity"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"

@@ -169,12 +169,13 @@ func TestUserController_Register_ValidationErrors(t *testing.T) {
 				t.Errorf("error decoding response body: %v", err)
 			}
 
+			errs := resp["errors"].(map[string]interface{})
 			for _, field := range tc.expectedFields {
-				assert.Contains(t, resp, field)
-				assert.NotEmpty(t, resp[field])
+				assert.Contains(t, errs, field)
+				assert.NotEmpty(t, errs[field])
 			}
 
-			assert.Equal(t, len(tc.expectedFields), len(resp))
+			assert.Equal(t, len(tc.expectedFields), len(errs))
 		})
 	}
 }

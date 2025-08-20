@@ -3,6 +3,7 @@ package validator
 import (
 	"errors"
 	"fmt"
+
 	"github.com/alishashelby/marketplace/internal/application/dto"
 	"github.com/go-playground/validator/v10"
 )
@@ -20,9 +21,9 @@ func NewUserValidator() *UserValidator {
 	return &UserValidator{validator: validator.New()}
 }
 
-func (uv *UserValidator) Validate(dto dto.UserDTO) map[string]any {
+func (uv *UserValidator) Validate(dto dto.UserDTO) map[string]string {
 	if err := uv.validator.Struct(dto); err != nil {
-		errs := make(map[string]any)
+		errs := make(map[string]string)
 		var validationErrors validator.ValidationErrors
 		if errors.As(err, &validationErrors) {
 			for _, valErr := range validationErrors {

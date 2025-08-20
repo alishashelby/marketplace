@@ -10,6 +10,7 @@ import (
 	"github.com/alishashelby/marketplace/internal/application/validator"
 	"github.com/alishashelby/marketplace/internal/domain/entity"
 	"github.com/alishashelby/marketplace/internal/infrastructure/repository/ad"
+	"github.com/alishashelby/marketplace/pkg"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -132,11 +133,12 @@ func TestAdController_CreateAd_ValidationErrors(t *testing.T) {
 
 	var resp map[string]interface{}
 	err := json.NewDecoder(w.Body).Decode(&resp)
+	errs := resp["errors"].(map[string]interface{})
 	assert.NoError(t, err)
-	assert.Contains(t, resp, "Title")
-	assert.Contains(t, resp, "Text")
-	assert.Contains(t, resp, "ImageURL")
-	assert.Contains(t, resp, "Price")
+	assert.Contains(t, errs, "Title")
+	assert.Contains(t, errs, "Text")
+	assert.Contains(t, errs, "ImageURL")
+	assert.Contains(t, errs, "Price")
 }
 
 func TestAdController_CreateAd_Unauthorized(t *testing.T) {
@@ -163,10 +165,10 @@ func TestAdController_CreateAd_Unauthorized(t *testing.T) {
 
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 
-	var resp string
+	var resp pkg.ErrorResponse
 	err = json.NewDecoder(w.Body).Decode(&resp)
 	assert.NoError(t, err)
-	assert.Equal(t, unauthorizedError, resp)
+	assert.Equal(t, unauthorizedError, resp.Error)
 }
 
 func TestAdController_CreateAd_UserDoesNotExist(t *testing.T) {
@@ -200,10 +202,10 @@ func TestAdController_CreateAd_UserDoesNotExist(t *testing.T) {
 
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
 
-	var resp string
+	var resp pkg.ErrorResponse
 	err = json.NewDecoder(w.Body).Decode(&resp)
 	assert.NoError(t, err)
-	assert.Equal(t, service.ErrorUserWithIDDoesNotExists.Error(), resp)
+	assert.Equal(t, service.ErrorUserWithIDDoesNotExists.Error(), resp.Error)
 }
 
 func TestAdController_CreateAd_AdServiceError(t *testing.T) {
@@ -242,10 +244,10 @@ func TestAdController_CreateAd_AdServiceError(t *testing.T) {
 
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
 
-	var resp string
+	var resp pkg.ErrorResponse
 	err = json.NewDecoder(w.Body).Decode(&resp)
 	assert.NoError(t, err)
-	assert.Equal(t, ad.ErrorFailedToSaveAd.Error(), resp)
+	assert.Equal(t, ad.ErrorFailedToSaveAd.Error(), resp.Error)
 }
 
 func TestAdController_GetAllAds(t *testing.T) {
@@ -321,10 +323,10 @@ func TestAdController_GetAdsWithOwned_Unauthorized(t *testing.T) {
 
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 
-	var resp string
+	var resp pkg.ErrorResponse
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	assert.NoError(t, err)
-	assert.Equal(t, unauthorizedError, resp)
+	assert.Equal(t, unauthorizedError, resp.Error)
 }
 
 func TestAdController_GetAllAds_WithOptions(t *testing.T) {
@@ -430,10 +432,10 @@ func TestAdController_GetAds_InvalidOptions(t *testing.T) {
 
 			assert.Equal(t, tc.expectedStatus, w.Code)
 
-			var resp string
+			var resp pkg.ErrorResponse
 			err := json.NewDecoder(w.Body).Decode(&resp)
 			assert.NoError(t, err)
-			assert.Equal(t, tc.expectedError, resp)
+			assert.Equal(t, tc.expectedError, resp.Error)
 		})
 	}
 }
@@ -454,10 +456,10 @@ func TestAdController_GetAds_NotFound(t *testing.T) {
 
 	assert.Equal(t, http.StatusNotFound, w.Code)
 
-	var resp string
+	var resp pkg.ErrorResponse
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	assert.NoError(t, err)
-	assert.Equal(t, ad.ErrorAdsNotFound.Error(), resp)
+	assert.Equal(t, ad.ErrorAdsNotFound.Error(), resp.Error)
 }
 
 func TestAdController_GetAds_ServiceError(t *testing.T) {
@@ -477,10 +479,10 @@ func TestAdController_GetAds_ServiceError(t *testing.T) {
 
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
 
-	var resp string
+	var resp pkg.ErrorResponse
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	assert.NoError(t, err)
-	assert.Equal(t, bdErr, resp)
+	assert.Equal(t, bdErr, resp.Error)
 }
 
 func TestAdController_GetIDFromToken(t *testing.T) {
