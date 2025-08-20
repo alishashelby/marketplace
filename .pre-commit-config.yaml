@@ -1,8 +1,8 @@
 repos:
   - repo: local
     hooks:
-      - id: golangci-lint
-        name: run golangci-lint per directory
+      - id: golangci-lint-swag-fmt
+        name: run golangci-and-swag-lint per directory
         entry: scripts/run-golangci-and-swag-lint.sh
         language: system
         types: [go]
