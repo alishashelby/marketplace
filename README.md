@@ -6,3 +6,4 @@ http://185.207.0.69:8081/api/ads?page=1&limit=10&sort_by=created_at&order_by=1&m
 
 ## Documentation:
 http://185.207.0.69:8081/swagger/index.html
+
